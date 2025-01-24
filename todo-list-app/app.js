@@ -689,23 +689,7 @@ function setupModalHandlers() {
         taskDisplay.innerHTML = '<div class="task-container"></div>';
         const cardContainer = taskDisplay.querySelector('.task-container');
         const user_task_ls = user["taskList"];
-
-        // Tags related code.
-
-        const predefinedTags = [
-            { value: uuidv4(), text: "Work" },
-            { value: uuidv4(), text: "Personal" },
-            { value: uuidv4(), text: "Urgent" }
-        ];
-
-        const tagModal = document.getElementById('tag-modal');
-        // const openTagModal = document.querySelector('.tag-button');
-        const closeTagModal = document.getElementById('close-tag-modal');
-
-        closeTagModal.addEventListener("click", () => {
-            tagModal.style.display = "none";
-        });
-
+        
         for (const task of user_task_ls) {
             const taskCard = document.createElement("div");
             taskCard.className = "task-card";
