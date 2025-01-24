@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Martian TaskForge Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/uuid/8.3.2/uuidv4.min.js"></script>
+    <!-- For getting the calender -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tagify library installation or requirements -->
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+    <div id="home-page" class="page">
+        <h1 class="title">Welcome to Martian TaskForge Pro.</h1>
+
+        <div class="auth-container">
+            <h2>Create Account</h2>
+            <form id="user-data">
+                <div class="input-group">
+                    <label for="name">Name</label>
+                    <input type="text" name="name" id="name" required placeholder="Enter your name">
+                </div>
+
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" required placeholder="Enter your email">
+                </div>
+                <button type="submit" id="submitBtn" class="submit-btn">Create Account</button>
+            </form>
+
+            <button type="button" class="select-user-btn" id="selectUserBtn">
+                Select Existing User
+            </button>
+
+        </div>
+    </div>
+
+
+    <!-- User Selection Modal -->
+    <div class="user-modal" id="userModal">
+        <div class="user-modal-content">
+            <div class="user-modal-header">
+                <h2>Select User</h2>
+                <button class="close-user-modal" id="closeUserModal">&times;</button>
+            </div>
+            <div class="user-list" id="userList">
+
+            </div>
+        </div>
+    </div>
+
+    <div id="user-profile" class="page" style="display:none;">
+
+        <div class="main-container">
+            <div class="sidebar">
+
+                <button type="button" class="sidebar-add-task" id="open-task-modal">+ Add New Task </button>
+                <div class="search-container">
+                    <input type="text" placeholder="Search tasks...">
+                </div>
+
+                <div class="sort-container">
+                    <select>
+                        <option value="" disabled selected>Sort tasks by...</option>
+                        <option value="date">Due Date</option>
+                        <option value="priority">Priority</option>
+                        <option value="status">Status</option>
+                    </select>
+                </div>
+                <button type="button" class="back-to-home" id="back-to-home">Home</button>
+
+            </div>
+            <!-- Container for showing tasks as a list -->
+            <!-- We changes this list container to show task as cards -->
+            <div class="content-area">
+                <div id="greet_user"></div>
+                <div id="task-display">
+                    <!-- <ol style="list-style-type: none;">
+                    </ol> -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Modal -->
+        <div id="task-modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modal-title">Add Task</h2>
+                    <button type="button" id="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="task-form">
+                        <div class="input-group">
+                            <label for="modal-task">Task:</label>
+                            <input type="text" id="modal-task" name="task" aria-required="true">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="modal-description">Description:</label>
+                            <textarea name="description" id="modal-description" rows="4" cols="50" maxlength="350"
+                                placeholder="Enter your description here...">
+                            </textarea>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="modal-status">Set current status: </label>
+                            <div class="select-wrapper">
+                                <select name="status" id="modal-status">
+                                    <!-- <option value="" disabled selected>Select an option</option> -->
+                                    <option value="not started">⭕ Not Started</option>
+                                    <option value="in progress">⏳ In Progress</option>
+                                    <option value="completed">✅ Completed</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <div class="input-group">
+                            <label for="modal-priority">Set your Priority: </label>
+                            <div class="select-wrapper">
+                                <select name="priority" id="modal-priority">
+                                    <option value="" disabled selected>Select an option</option>
+                                    <option value="high">🔴 High Priority</option>
+                                    <option value="medium">🟡 Medium Priority</option>
+                                    <option value="low">🔵 Low Priority</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="modal-dueDate">Due Date</label>
+                            <input type="text" id="modal-dueDate" placeholder="Select Due Date and Time">
+                        </div>
+                        <button type="submit" id="save-task">Save Task</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="tag-modal" class="tag-modal-container" style="display: none;">
+            <div class="tag-modal-content">
+              <div class="tag-modal-header">
+                <h2>Manage Tags</h2>
+                <button type="button" class="close-tag-modal" id="close-tag-modal">&times;</button>
+              </div>
+              <div class="tag-modal-body">
+                <!-- <input name="basic" value="" autofocus> -->
+                <input name="input-custom-dropdown" class="tagify--custom-dropdown" placeholder="Type an English letter" value="css, html, javascript">
+                <button type="button" class="save-tag" id="save-tag">Save</button>
+              </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- script for flatpickr library  -->
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            flatpickr("#modal-dueDate", {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                altInput: true,
+                altFormat: "F j, Y h:i K",
+                minDate: "today"
+            });
+        });
+
+    </script>
+
+    <script type="module" src="navigation.js" defer></script>
+    <script type="module" src="ui.js" defer></script>
+    <script type="module" src="data.js" defer></script>
+    <script type="module" src="validation.js" defer></script>
+    <script type="module" src="tagManagement.js" defer></script>
+    <script type="module" src="app.js" defer> </script>
+
+</body>
+
+</html>
