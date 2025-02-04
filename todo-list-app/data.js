@@ -184,6 +184,7 @@ export class User{
         this.created_at = new Date();
         this.username = email.split("@")[0];
         this.taskList = [];
+
         this.customTags = new Set();
     }
 
@@ -202,6 +203,7 @@ export class User{
             username : this.username,
             // Converting the task object into a string in taskList object, so firstly we are iterating those tasks object and converting them into a string and then storing them into a map.
             taskList : this.taskList.map(task => task.toData()),
+
             customTags: Array.from(this.customTags).map(tag => ({...tag})),
         };
     }
@@ -211,6 +213,7 @@ export class User{
         const user = new User(data.name, data.email);
         user.created_at = new Date(data.created_at);
         user.taskList = data.taskList.map(taskData => Task.fromData(taskData));
+
         if (data.customTags){
             user.customTags = new Set(data.customTags.map(tag => ({...tag})));
         }
@@ -227,6 +230,117 @@ export class User{
         }
         return false;
     }
+
+    // My code with so many errors...
+    // deleteTask(taskIds){
+    //     const taskIdsSet = Array.from(taskIds);
+    //     const validateCnt = 0;
+    //     const delete_modal_body = document.querySelector('.delete-modal-body');
+    //     const content = delete_modal_body.querySelectorAll('h2');
+    //     const delete_modal_header = document.querySelector('.delete-modal-header');
+    //     const element = document.createElement('h1');
+    //     element.className = 'delete-modal-heading';
+    //     delete_modal_header.appendChild(element);
+    //     const deleteBtn = document.querySelector('.modal-delete-btn');
+    //     const tempSet = [];
+
+    //     taskIdsSet.forEach(taskId => {
+    //         if( uuidv4.validate(taskId)){
+    //             validateCnt++;
+    //             tempSet.push(taskId);
+    //             this.taskList.forEach(task => {
+    //                 if(task.task_id != taskId){
+    //                     if (validateCnt === 1){
+    //                         alert("Task deleted successfully.");
+    //                     }
+    //                     else  {
+    //                         alert("Tasks deleted successfully");
+    //                     }
+    //                 }
+    //             })
+    //         }
+    //         else{
+    //             console.log("Task Id is not valid, please check...");
+    //         }
+    //     });
+
+    //     deleteBtn.addEventListener('click',()=>{
+    //         tempSet.forEach(taskId =>{
+    //             this.taskList.filter(task => task.task_id === taskId);
+    //         });
+            
+    //     });
+
+
+    //     // Deleting one task.
+    //     // I know that instead of using validateCnt, I can directly use taskIds set count, but this extra code is because we are adding validation.
+    //     if (validateCnt === 1){
+    //         element.textContent = 'Delete task?';
+    //         content[0].style.display = 'block';
+            
+    //     }
+    //     // Deleting more than 1 task.
+
+    //     else if(validateCnt > 1){ 
+    //         // (I think else is fine.)
+    //         element.textContent = `Delete ${validateCnt} tasks?`;
+    //         content[1].style.display = 'block';
+    //     }
+
+    // }
+
+    // *** Refactored deletion code. ***
+    deleteTask (taskIds) {
+        const taskIdsSet = Array.from(taskIds);
+        const validTaskIds = [];
+        const invalidTaskIds = [];
+
+        taskIdsSet.forEach(taskId => {
+            if (uuid.validate(taskId)) {
+                console.log(uuid.validate(taskId));
+            }
+            else {
+                invalidTaskIds.push(taskId);
+                console.log(`Task ID ${taskId} is invalid.`);
+            }
+        });
+
+        // This invalidTaskIds array or this condition is not valid, as we usually don't have this invalidtaskId case, I don't know that how it can even occur.
+        if (invalidTaskIds.length > 0){
+            console.log("Some task IDs are invalid. Please check.");
+        }
+
+        if (validTaskIds.length === 0){
+            return; 
+        }
+
+        // Confirm deletion with the user (Using the modal)
+        // We can use similar logic for delete_modal_body as we had use for delete_modal_header, instead of hiding or displaying the h2 elements.
+        
+        const delete_modal_body = document.querySelector('.delete-modal-body');
+        const content = delete_modal_body.querySelectorAll('h2');
+        const delete_modal_header = document.querySelector('.delete-modal-header');
+        const element = document.createElement('h1');
+        element.className = 'delete-modal-heading';
+        delete_modal_header.appendChild(element);
+        const deleteBtn = document.querySelector('.modal-delete-btn');
+
+        if (validTaskIds.length === 1) {
+            element.textContent = 'Delete task?';
+            content[0].style.display = 'block';
+        }
+        else {
+            element.textContent = `Delete ${validTaskIds.length} tasks?`;
+            content[1].style.display = 'block';
+        }
+
+        deleteBtn.addEventListener('click',()=>{
+
+            // Delete using filter and reassignment
+            this.taskList = this.taskList.filter(task => !validTaskIds.includes(task.task_id));
+        });
+    }
+
 }
 
 export class Task{
@@ -245,6 +359,7 @@ export class Task{
         this.description = description;
         // I was not creating Date object for due date.
         this.dueDate = dueDate ? new Date(dueDate) : null;
+
         this.tagsSet = new Set();
     }
 
@@ -260,6 +375,7 @@ export class Task{
             priority:this.priority,
             // dueDate:this.dueDate.toISOString()
             dueDate: this.dueDate instanceof Date ? this.dueDate.toISOString() : null,
+
             tagsSet:Array.from(this.tagsSet).map(tag => ({...tag})),
 
         };
@@ -277,7 +393,7 @@ export class Task{
         // Passing a string and expecting the constructor to handle the conversion.
         task.dueDate = data.dueDate; 
         // task.dueDate = data.dueDate ? new Date(data.dueDate) : null; 
-        // task.tagsSet = 
+
         if (data.tagsSet){
             task.tagsSet = new Set(data.tagsSet.map(tag => ({...tag})));
         }
