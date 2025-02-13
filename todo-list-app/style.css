@@ -1,5 +1,5 @@
  /* For blurring and disabling all the things in background when any modal is opened? */
- 
+
 .global-overlay {
     position: fixed;
     top: 0;
@@ -81,6 +81,163 @@
     font-size: 14px;
     background-color: white;
 }
+
+/* Filter related css */
+/* Filter Button in Sidebar */
+.sidebar-filter-btn {
+    width: 100%;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    transition: all 0.2s ease;
+}
+
+.sidebar-filter-btn:hover {
+    background: #f5f5f5;
+}
+
+/* Filter Panel */
+.filter-panel {
+    position: fixed;
+    right: -320px; /* Start off-screen */
+    top: 0;
+    width: 320px;
+    height: 100vh;
+    background: #fff;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease;
+    z-index: 1000;
+}
+
+.filter-panel.active {
+    right: 0;
+}
+
+.filter-panel-content {
+    padding: 24px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.filter-panel-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.close-filter-panel {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px;
+}
+
+/* Filter Sections */
+.filter-sections {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.filter-section {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.filter-section h4 {
+    margin: 0 0 16px 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #666;
+}
+
+/* Radio Buttons */
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+}
+
+.radio-label:hover {
+    background: #f5f5f5;
+}
+
+.radio-label input[type="radio"] {
+    display: none;
+}
+
+.radio-custom {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom {
+    border-color: #007bff;
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: #007bff;
+    border-radius: 50%;
+}
+
+/* Filter Actions */
+.filter-actions {
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.clear-filters {
+    width: 100%;
+    padding: 12px;
+    background: #f5f5f5;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.clear-filters:hover {
+    background: #e0e0e0;
+}
+
 
 /* Add task button in sidebar */
 .sidebar-add-task {
@@ -628,22 +785,35 @@ input:focus {
 .task-checkbox-wrapper {
     position: absolute;
     left: -12px;
-    /* Slightly outside card */
     top: 50%;
     transform: translateY(-50%);
     width: 24px;
     height: 24px;
     z-index: 11;
+    opacity: 0; /* Hidden by default */
+    transition: opacity 0.2s ease; /* Smooth transition */
+}
+
+/* Always show checkbox when in selection-mode */
+.selection-mode .task-checkbox-wrapper {
+    opacity: 1;
+    /* pointer-events: auto; */
 }
 
 .task-checkbox {
-    position: absolute;
+    /* position: absolute;
     opacity: 0;
     cursor: pointer;
     width: 100%;
     height: 100%;
-    z-index: 12;
+    z-index: 12; */
     /* Make sure it's clickable */
+
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 12;
+    cursor: pointer;
 }
 
 /* Show checkbox when card is hovered or checkbox is checked */
@@ -682,17 +852,49 @@ input:focus {
     font-size: 16px;
 }
 
+/* For showing checkbox all the time, when one checkbox is selected, not on hovering on any task */
+.task-card.selection-active .task-selection {
+    display: flex !important;
+}
+
+/* For showing unchecked checkboxes, when a checkbox is marked */
+/* Ensure task-selection is visible in selection mode */
+.selection-mode .task-selection {
+    display: flex !important;
+    opacity: 1 !important;
+    /* align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem; */
+}
+
+/* Hide delete icon when in selection mode */
+.selection-mode .delete-icon {
+    display: none !important;
+}
+
+/* Updating delete-icon position and size */
 .delete-icon {
     position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
+    right: 0.75rem;
+    top: 1.25rem;
+    font-size: 8px; /* Further reduced size */
     opacity: 0;
     cursor: pointer;
-    padding: 5px;
+    padding: 1px; /* Even less padding */
     border-radius: 4px;
-    font-size: 20px;
     z-index: 11;
+    color: #64748b; /* Keep the original color */
+    transition: opacity 0.2s ease;
+}
+
+/* Ensure delete icon shows on hover when not in selection mode */
+body:not(.selection-mode) .task-card:hover .delete-icon{
+    opacity:1;
+}
+
+/* Show checkbox on hover when not in selection-mode */
+body:not(.selection-mode) .task-card:hover .task-checkbox-wrapper {
+    opacity: 1;
 }
 
 /* Show delete icon on hover */
@@ -701,7 +903,27 @@ input:focus {
 }
 
 .delete-icon:hover {
-    background-color: rgba(255, 0, 0, 0.1);
+    /* background-color: rgba(239, 68, 68, 0.1);  /* Softer red background */
+    /* color: #ef4444;  Red on hover */ 
+    /* box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); */
+    background-color: rgba(209, 213, 219, 0.3); /* Lighter gray, more subtle */
+    color: #1f2937; /* Darker gray/almost black on hover */
+    /* Optional: Add a very subtle border on hover */
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure delete icon shows properly after selection mode */
+.task-card:not(.selection-mode) .delete-icon {
+    position: absolute;
+    right: 0.75rem;
+    top: 0.75rem;
+    transform: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.task-card:not(.selection-mode):hover .delete-icon {
+    opacity: 1;
 }
 
 /* Delete functionality related css completed. */
@@ -711,25 +933,46 @@ input:focus {
 .delete-modal-content {
     position: fixed;
     top: 55%;
-    left: 50%;
+    left: 51%;
     transform: translate(-50%, -50%);
     background: white;
     border-radius: 16px;
-    padding: 2rem;
-    width: 90%;
+    /* Reduced padding for more compact look */
+    padding: 1.5rem;
+    /* Reduced width for more focused appearrance */
+    width: 80%;
     max-width: 500px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1001;
     /* Ensure it's on top of other elements */
     backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction:column;
+    gap: 1.5rem;
+} 
+
+/* Modal button container fix -- Added later.*/
+/* .delete-modal-content {
+    display: flex;
+    flex-direction:column;
+    gap: 1.5rem;
+} */
+
+.delete-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+    /* margin-top: 0.5rem; */
 }
 
 .delete-modal-header {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
     border-bottom: 1px solid #eee;
 }
 
@@ -741,6 +984,7 @@ input:focus {
 
 .delete-modal-body {
     text-align: center;
+    margin-bottom:0.75 rem;
 }
 
 .delete-modal-body h2 {
@@ -751,14 +995,13 @@ input:focus {
 
 .modal-cancel-btn,
 .modal-delete-btn {
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem 1rem;
     border: none;
-    border-radius: 8px;
-    font-size: 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-    margin: 0 0.5rem;
 }
 
 .modal-cancel-btn {
@@ -841,6 +1084,8 @@ input:focus {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    /* Added top margin to create space for delete icon */
+    margin-top:0.5rem;
     margin-bottom: 0.75rem;
 }
 
@@ -857,9 +1102,9 @@ input:focus {
 .status-priority {
     display: flex;
     align-items: center;
-    /* gap: 0.75rem;
-     */
     gap: 8px;
+    /* Ensure priority text doesn't overlap with delete icon */
+    padding-right: 1.75rem;
 }
 
 .priority-flag {
