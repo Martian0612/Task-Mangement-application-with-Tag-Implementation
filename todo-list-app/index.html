@@ -69,14 +69,108 @@
             <div class="sidebar">
 
                 <button type="button" class="sidebar-add-task" id="open-task-modal">+ Add New Task </button>
+                <!-- Trying to improve the + button -->
+                <!-- <button type="button" class="sidebar-add-task" id="open-task-modal">
+                    <span class="add-icon">+ </span>Add New Task
+                </button> -->
                 <div class="search-container">
                     <input type="text" placeholder="Search tasks...">
                 </div>
 
+                <button class="sidebar-filter-btn" id="open-filter-panel">
+                    <span class="filter-icon">⚡</span>Filters
+                </button>
+
+                <!-- Filter Panel Container -->
+
+                <div class="filter-panel" id="filter-panel">
+                    <div class="filter-panel-content">
+                        <div class="filter-panel-header">
+                            <h3>Filters</h3>
+                            <button class="close-filter-panel" id="close-filter-panel">&times;</button>
+                        </div>
+                
+                        <div class="filter-sections">
+                            <!-- Status Filter Section -->
+                            <div class="filter-section">
+                                <h4>Status</h4>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="status" value="not-started">
+                                        <span class="radio-custom"></span>
+                                        <span class="status-icon">⭕</span> Not Started
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="status" value="in-progress">
+                                        <span class="radio-custom"></span>
+                                        <span class="status-icon">⏳</span> In Progress
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="status" value="completed">
+                                        <span class="radio-custom"></span>
+                                        <span class="status-icon">✅</span> Completed
+                                    </label>
+                                </div>
+                            </div>
+                
+                            <!-- Priority Filter Section -->
+                            <div class="filter-section">
+                                <h4>Priority</h4>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="priority" value="high">
+                                        <span class="radio-custom"></span>
+                                        <span class="priority-icon">🔴</span> High
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="priority" value="medium">
+                                        <span class="radio-custom"></span>
+                                        <span class="priority-icon">🟡</span> Medium
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="priority" value="low">
+                                        <span class="radio-custom"></span>
+                                        <span class="priority-icon">🔵</span> Low
+                                    </label>
+                                </div>
+                            </div>
+                
+                            <!-- Time Filter Section -->
+                            <div class="filter-section">
+                                <h4>Due Date</h4>
+                                <div class="radio-group">
+                                    <label class="radio-label">
+                                        <input type="radio" name="time" value="today">
+                                        <span class="radio-custom"></span>
+                                        Today
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="time" value="this-week">
+                                        <span class="radio-custom"></span>
+                                        This Week
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="time" value="this-month">
+                                        <span class="radio-custom"></span>
+                                        This Month
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <div class="filter-actions">
+                            <button class="clear-filters" id="clear-filters">Clear All Filters</button>
+                        </div>
+                    </div>
+                </div>
                 <div class="sort-container">
                     <select>
                         <option value="" disabled selected>Sort tasks by...</option>
-                        <option value="date">Due Date</option>
+                        <!-- Thinking to remove the disabled selected now, because unable to think of any other way to reset sorting or remove sorting option. -->
+                        <!-- <option value="" >Sort tasks by...</option> -->
+                        <option value="none" >Default order</option>
+                        <option value="dueDateAsc">Due Date ↑</option>
+                        <option value="dueDateDesc">Due Date ↓</option>
                         <option value="priority">Priority</option>
                         <option value="status">Status</option>
                     </select>
@@ -182,12 +276,13 @@
                     <!-- Dynamic content -->
 
                     <!-- for delete from icon (Initially hidden.)-->
-                    <h2 style="display: none;">Are you sure you want to delete this task?</h2>
+                    <!-- <h2 style="display: none;">Are you sure you want to delete this task?</h2> -->
                     
                     <!-- for checkbox deletion(multiple task deletion. (Initially hidden)) -->
-                    <h2 style="display:none">Are you sure you want to permanently delete this task? This cannot be
-                        undone.</h2>
-
+                    <!-- <h2 style="display:none">Are you sure you want to permanently delete this task? This cannot be
+                        undone.</h2> -->
+                </div>
+                <div class="delete-modal-actions">
                     <button class="modal-cancel-btn">Cancel</button>
                     <button class="modal-delete-btn">Delete</button>
                 </div>
@@ -231,7 +326,7 @@
     <script type="module" src="ui.js" defer></script>
     <script type="module" src="data.js" defer></script>
     <script type="module" src="validation.js" defer></script>
-    <script type="module" src="selectionManager.js" defer></script>
+    <script type="module" src="deletionManagement.js" defer></script>
     <script type="module" src="tagManagement.js" defer></script>
     <script type="module" src="app.js" defer> </script>
 
