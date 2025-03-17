@@ -4,41 +4,27 @@ function displayTasks(user, current_task_ls, message = "") {
     const taskDisplay = document.querySelector("#task-display");
     taskDisplay.innerHTML = '<div class="task-container"></div>';
     const cardContainer = taskDisplay.querySelector('.task-container');
-    // Not updating it inside function.
-    // const user_task_ls = user["taskList"];
-    // USING "LET" OVER "CONST" BECAUSE DEFINING THIS VARIABLE AT MULTIPLE PLACES.
     let user_task_ls = current_task_ls;
-
-
-    const predefinedTags = [
-        { value: uuidv4(), text: "Work" },
-        { value: uuidv4(), text: "Personal" },
-        { value: uuidv4(), text: "Urgent" }
-    ];
-
-    const tagModal = document.getElementById('tag-modal');
-    // const openTagModal = document.querySelector('.tag-button');
-    const closeTagModal = document.getElementById('close-tag-modal');
-
-    closeTagModal.addEventListener("click", () => {
-        tagModal.style.display = "none";
-    });
-
     console.log("got the message: ", message);
-
     if (message) {
         cardContainer.innerHTML = `<div class="no-tasks-container"><p class="no-tasks-message">${message}</p></div>`;
     }
-
     else {
         for (const task of user_task_ls) {
             const taskCard = document.createElement("div");
             taskCard.className = "task-card";
-
-            // Convert the task's due date to a formatted string
             const dueDate = new Date(task.dueDate);
             const formattedDate = dueDate.toLocaleDateString() + ' ' + dueDate.toLocaleTimeString();
-
+            const isActive = dueDate > new Date();
+            const bellIconHTML = `
+            <button class="reminder-button" id="reminder-btn-${task.task_id} data-task-id="${task.task_id}" ${isActive ? 'data-reminder="active"' : ''}> 
+            <span><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                   </svg></span>
+            <div class="reminder-tooltip">${formattedDate}</div>
+            </button>
+            `;
             taskCard.innerHTML = `
                 <div class="task-selection">
                     <div class="task-checkbox-wrapper">
@@ -47,7 +33,6 @@ function displayTasks(user, current_task_ls, message = "") {
                     </div>
                     <i class="material-icons delete-icon" data-task-id="${task.task_id}">delete</i>
                 </div>
-    
                 <div class="card-header">
                     <h3 class="task-title">${task.task}</h3>
                     <div class="status-priority">
@@ -58,63 +43,61 @@ function displayTasks(user, current_task_ls, message = "") {
                         </div>
                     </div>
                 </div>
-    
                 <div class="tags-container"> </div>
-         
-    
                 <div class="card-footer">
-                    <button class="tag-button" ">
-                        <span class="tag-icon">+</span>
+                    <button class="tag-button" id="tag-btn-${task.task_id}" data-task-id="${task.task_id}">
                         <span>Add Tag</span>
                     </button>
-                    <button class="reminder-btn" title="${formattedDate}" date-has-reminder="true">
-                        <span>🔔</span>
-                    </button>
+                     ${bellIconHTML}
                 </div> `;
-
-            // *************************************
-
-            taskCard.querySelector('.tag-button').dataset.taskid = task.task_id;
-            // Add click handler for editing(i.e. allow to edit only if it is not click at any button like add tag, notify or tags chip itself.)
-            taskCard.addEventListener("click", (e) => {
-
-                // If clciked on checkbox or delete icon, don't open modal.
-                if (e.target.closest('.task-checkbox') || e.target.closest('.delete-icon')) {
-                    return;
-                }
-
-                // If clicked on tag button or reminder button, don't open modal.
-                // if (e.target.closest('.tag-button') ||e.target.closest('.reminder-btn')){
-                //     return;
-                // }
-
-                // **************************** Check this part *************************
-                // This condition is sort of redundant, but let's add it for now.
-                if (!e.target.closest('.tag-button') && !e.target.closest('.reminder-btn')) {
-                    document.getElementById("modal-title").textContent = "Update Task";
-                    isEditMode = true; // Using the global variable
-                    editTaskId = task.task_id; // Using the global variable
-                    populateModalForm(task);
-                    modal.style.display = "block";
-                    // Added later on, after working with delete functionality.
-                }
-
-                // else if (e.target.closest('.tag-button')) {
-                else if (e.target.closest('.tag-button')) {
-                    const button = e.target.closest('.tag-button');
-
-                    // Setting the task_id to tagModal from tagButton.
-                    const taskId = button.dataset.taskid;
-                    console.log("taskId at button is ", taskId);
-                    tagModal.dataset.taskid = taskId; // Set taskId on the modal
-                    tagModal.style.display = 'block';
-                    tagHandler(user, predefinedTags, tagModal);
-                    console.log(tagModal.dataset.taskid);
-                }
-            });
-
+            taskCard.dataset.taskId = task.task_id;
             cardContainer.appendChild(taskCard);
-
+            updateTaskCardTags(task, userListKey, userMap);
         }
     }
+    function handleTaskDisplayClick(event) {
+        if (!event.target.closest('.task-card')) return;
+        if (event.target.matches('.tag-button') || event.target.closest('.tag-button')) {
+            console.log("user is ", userList.find(user => user.username === "marshian2511"));
+            const predefinedTags = [
+                { value: uuidv4(), text: "Work" },
+                { value: uuidv4(), text: "Personal" },
+                { value: uuidv4(), text: "Urgent" }
+            ];
+            event.stopPropagation();
+            const taskCard = event.target.closest('.task-card');
+            const taskId = taskCard.dataset.taskId;
+            console.log("Tag button clicked for task: ", taskId);
+            const tagModal = document.getElementById('tag-modal');
+            tagModal.dataset.taskid = taskId;
+            tagModal.style.display = 'block';
+            tagHandler(userListKey, userMap, currentUser, predefinedTags, tagModal);
+            return;
+        }
+        if (event.target.matches('.reminder-button') || event.target.closest('.reminder-button')) {
+            event.stopPropagation();
+            const taskId = event.target.closest('.task-card').dataset.taskId;
+            console.log("Reminder button clicked for task: ", taskId);
+            return;
+        }
+        if (event.target.closest('.task-card') &&
+            !event.target.matches('task-checkbox') &&
+            !event.target.closest('.task-checkbox') &&
+            !event.target.matches('.delete-icon') &&
+            !event.target.closest('.delete-icon')) {
+            const taskCard = event.target.closest('.task-card');
+            console.log("taskCard is ", taskCard);
+            const taskId = taskCard.dataset.taskId;
+            console.log("Task card clicked, opening edit modal", taskId);
+            document.getElementById("modal-title").textContent = "Update Task";
+            isEditMode = true;
+            editTaskId = taskId;
+            const task = current_task_ls.find(t => t.task_id === taskId);
+            console.log("task is ", task);
+            populateModalForm(task);
+            modal.style.display = "block";
+        }
+    }
+    taskDisplay.removeEventListener("click", handleTaskDisplayClick);
+    taskDisplay.addEventListener("click", handleTaskDisplayClick);
 }
