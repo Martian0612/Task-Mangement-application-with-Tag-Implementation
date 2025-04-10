@@ -1,0 +1,150 @@
+export class User{
+    constructor(name, email){
+        this.name = name;
+        this.email = email;
+        this.created_at = new Date();
+        this.username = email.split("@")[0];
+        this.taskList = [];
+
+        this.customTags = new Set();
+    }
+
+    addTasks(task,description,status,priority,dueDate){
+        const taskObj = new Task(this.username, task,description, status , priority , dueDate);
+        this.taskList.push(taskObj);
+        return taskObj;
+    }
+
+    // Convert User instance to a plain data object for storage.
+    toData(){
+        return {
+            name: this.name,
+            email : this.email,
+            created_at : this.created_at.toISOString(),
+            username : this.username,
+            // Converting the task object into a string in taskList object, so firstly we are iterating those tasks object and converting them into a string and then storing them into a map.
+            taskList : this.taskList.map(task => task.toData()),
+
+            customTags: Array.from(this.customTags).map(tag => ({...tag})),
+        };
+    }
+
+    // Creates a User instance from a plain data object
+    static fromData(data){
+        const user = new User(data.name, data.email);
+        user.created_at = new Date(data.created_at);
+        user.taskList = data.taskList.map(taskData => Task.fromData(taskData));
+
+        if (data.customTags){
+            user.customTags = new Set(data.customTags.map(tag => ({...tag})));
+        }
+        return user;
+    }
+
+    // Form data is that data, from which we will fetch the updated data, that's why its needed and task_id to update actual task.
+    updateTask(taskId,formData){
+        const taskIndex = this.taskList.findIndex(task=> task.task_id === taskId);
+        // If task with that id exists then call the update method of task.
+        if(taskIndex !== -1){
+            this.taskList[taskIndex].update(formData);
+            return true;
+        }
+        return false;
+    }
+  
+    // Delete Task (Updated code)
+    deleteTask(taskIds) {
+        console.log("taskId is : ",taskIds);
+        const validTaskIds = [];
+        function isValidId(uuid) {
+            const regex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
+            return regex.test(uuid);
+          }
+
+        for (const taskId of taskIds) {
+            if (isValidId(taskId)) {
+                validTaskIds.push(taskId);
+            }
+            else {
+                console.warn(`Invalid task ID: ${taskId}`);
+            }
+        }
+
+        if (validTaskIds.length != taskIds.size) {
+            console.warn("Some task IDs were invalid.");
+        }
+
+        this.taskList = this.taskList.filter(task => !validTaskIds.includes(task.task_id));
+        return validTaskIds.length > 0; // This is use for later updating the delete modal body and header content.
+    }
+
+}
+
+export class Task{
+  
+    // constructor(username, task, status , priority ,description, dueDate){
+    constructor(username, task, description="", status = "not started", priority = "", dueDate=null){
+    // constructor(username, task, description="", status = "not started", priority = "low", dueDate=null){
+        this.username = username;
+        this.task = task;
+        this.created_at = new Date();
+        this.task_id = uuidv4();
+
+        // Optional fields
+        this.status = status;
+        this.priority = priority;
+        this.description = description;
+        // I was not creating Date object for due date.
+        this.dueDate = dueDate ? new Date(dueDate) : null;
+
+        this.tagsSet = new Set();
+    }
+
+    toData(){
+        return {
+            username: this.username,
+            task : this.task,
+            created_at : this.created_at.toISOString(),
+            task_id : this.task_id,
+            // Extra fields
+            description: this.description,
+            status: this.status,
+            priority:this.priority,
+            // dueDate:this.dueDate.toISOString()
+            dueDate: this.dueDate instanceof Date ? this.dueDate.toISOString() : null,
+
+            tagsSet:Array.from(this.tagsSet).map(tag => ({...tag})),
+
+        };
+    }
+
+    static fromData(data){
+        const task = new Task(data.username, data.task);
+        task.created_at = new Date(data.created_at);
+        task.task_id = data.task_id;
+
+        // Extra fields
+        task.description = data.description;
+        task.status = data.status;
+        task.priority = data.priority;
+        // Passing a string and expecting the constructor to handle the conversion.
+        // task.dueDate = data.dueDate; 
+
+        // *** Fixing date format ***
+        task.dueDate = data.dueDate ? new Date(data.dueDate) : null; 
+
+        if (data.tagsSet){
+            task.tagsSet = new Set(data.tagsSet.map(tag => ({...tag})));
+        }
+        return task;
+    }
+
+    update(formData){
+        this.task = formData.task;
+        this.description = formData.description;
+        this.status = formData.status;
+        this.priority = formData.priority;
+
+        this.dueDate = formData.dueDate ? new Date(formData.dueDate) : null;
+    }
+}
