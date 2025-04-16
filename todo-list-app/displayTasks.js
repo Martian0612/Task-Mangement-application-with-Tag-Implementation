@@ -74,10 +74,54 @@ function displayTasks(user, current_task_ls, message = "") {
             tagHandler(userListKey, userMap, currentUser, predefinedTags, tagModal);
             return;
         }
-        if (event.target.matches('.reminder-button') || event.target.closest('.reminder-button')) {
+       if (event.target.matches('.reminder-button') || event.target.closest('.reminder-button')) {
             event.stopPropagation();
+            const reminderButton = event.target.closest('.reminder-button');
             const taskId = event.target.closest('.task-card').dataset.taskId;
             console.log("Reminder button clicked for task: ", taskId);
+
+            // Toggle the UI state for the reminder button
+            reminderButton.classList.toggle('setting-reminder');
+
+            // Update the bell icon based on state
+            const bellIcon = reminderButton.querySelector('.bell-icon');
+            if (reminderButton.classList.contains('setting-reminder')) {
+                // Change to bell with sound waves
+                bellIcon.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 8c0-2.2.7-4.3 2-6" stroke="currentColor" stroke-width="2"></path>
+                    <path d="M22 8a10 10 0 0 0-2-6" stroke="currentColor" stroke-width="2"></path>
+                </svg>
+            `;
+
+                // Hide tooltip when reminder/notification is set.
+                const tooltip = reminderButton.querySelector('.reminder-tooltip');
+                if (tooltip) tooltip.style.display = 'none';
+            }
+
+            else {
+                // Revert to original or default bell when either no date and time is set, or date and time is set.
+                // const isActive = reminderButton.hasAttribute('data-reminder') && 
+                //                  reminderButton.getAttribute('data-reminder') ==="active";
+
+                // bellIcon.innerHTML = `
+                //     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="${isActive ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                //         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                //         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                //     </svg>`;
+
+                bellIcon.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+            `;
+
+                // Show tooltip again
+                const tooltip = reminderButton.querySelector('.reminder-tooltip');
+                if (tooltip) tooltip.style.display = '';
+            }
+
             return;
         }
         if (event.target.closest('.task-card') &&
