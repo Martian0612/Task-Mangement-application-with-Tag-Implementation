@@ -16,6 +16,7 @@ function displayTasks(user, current_task_ls, message = "") {
             const dueDate = new Date(task.dueDate);
             const formattedDate = dueDate.toLocaleDateString() + ' ' + dueDate.toLocaleTimeString();
             const isActive = dueDate > new Date();
+            // Default bell state when there is no date and time are set.
             const bellIconHTML = `
             <button class="reminder-button" id="reminder-btn-${task.task_id} data-task-id="${task.task_id}" ${isActive ? 'data-reminder="active"' : ''}> 
             <span><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
